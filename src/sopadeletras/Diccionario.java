@@ -1,5 +1,6 @@
 package sopadeletras;
  import java.util.HashSet;
+import java.util.Set;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -18,8 +19,8 @@ public class Diccionario {
         palabras = new HashSet<>();
     }
 
-    public void agregarPalabra(String palabra) {
-        palabras.add(palabra);
+    public boolean agregarPalabra(String palabra) {
+    return palabras.add(palabra.toLowerCase());
     }
 
     public boolean contienePalabra(String palabra) {
@@ -31,5 +32,8 @@ public class Diccionario {
             System.out.println(palabra);
         }
     }
+    public Set<String> getPalabras() {
+    return palabras;
+}
 }
 

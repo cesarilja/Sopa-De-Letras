@@ -28,5 +28,16 @@ public class Tablero {
              System.out.println();
         }
       }
+     // Para mostrar en área de texto de la interfaz
+    public String tableroComoTexto() {
+        StringBuilder sb = new StringBuilder();
+        for (char[] fila : letras) {
+            for (char c : fila) {
+                sb.append(c).append(' ');
+            }
+            sb.append('\n');
+        }
+        return sb.toString();
+    }
   }
 
