@@ -5,6 +5,13 @@
 package sopadeletras;
 
 import javax.swing.JOptionPane;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import javax.swing.JFileChooser;       
+import sopadeletras.Diccionario;
+import sopadeletras.Tablero;
 
 /**
  *
@@ -12,12 +19,85 @@ import javax.swing.JOptionPane;
  */
 public class InterfazSopaDeLetras extends javax.swing.JFrame {
     private Diccionario diccionario;
+    private Tablero tablero;             
 
-    /**
-     * Creates new form InterfazSD
-     */
     public InterfazSopaDeLetras() {
         initComponents();
+        this.diccionario = new Diccionario();
+        this.tablero = null;              
+
+        
+        CargarArchivo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cargarArchivoActionPerformed(evt);
+            }
+        });
+    }
+
+    private void cargarArchivoActionPerformed(java.awt.event.ActionEvent evt) {
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(this);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File archivo = fileChooser.getSelectedFile();
+            try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+                String linea;
+                boolean leyendoDiccionario = false;
+                boolean leyendoTablero = false;
+                diccionario = new Diccionario();
+                char[][] letrasTablero = new char[4][4];
+                int filaTablero = 0;
+
+                while ((linea = br.readLine()) != null) {
+                    linea = linea.trim();
+                    if (linea.equalsIgnoreCase("dic")) {
+                        leyendoDiccionario = true;
+                        continue;
+                    }
+                    if (linea.equalsIgnoreCase("/dic")) {
+                        leyendoDiccionario = false;
+                        continue;
+                    }
+                    if (linea.equalsIgnoreCase("tab")) {
+                        leyendoTablero = true;
+                        continue;
+                    }
+                    if (linea.equalsIgnoreCase("/tab")) {
+                        leyendoTablero = false;
+                        continue;
+                    }
+
+                    if (leyendoDiccionario && !linea.isEmpty()) {
+                        diccionario.agregarPalabra(linea);
+                    }
+                    if (leyendoTablero && !linea.isEmpty()) {
+                        // Se espera una línea con 16 letras separadas por coma
+                        String[] letras = linea.split(",");
+                        if (letras.length != 16) {
+                            JOptionPane.showMessageDialog(this, "Error: El tablero debe tener 16 letras.", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                        int idx = 0;
+                        for (int i = 0; i < 4; i++) {
+                            for (int j = 0; j < 4; j++) {
+                                letrasTablero[i][j] = letras[idx++].trim().charAt(0);
+                            }
+                        }
+                    }
+                }
+
+                tablero = new Tablero(letrasTablero);
+
+                // Mostrar tablero en la interfaz
+                AreaTablero.setText(tablero.tableroComoTexto());
+                AreaResultado.setText("Archivo cargado correctamente. Diccionario y tablero listos.\n");
+
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Error al leer el archivo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error en el formato del archivo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     /**
@@ -73,6 +153,11 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         getContentPane().add(TextoPalabra, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 180, 30));
 
         CargarArchivo.setText("CARGAR ARCHIVO");
+        CargarArchivo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CargarArchivoActionPerformed(evt);
+            }
+        });
         getContentPane().add(CargarArchivo, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 80, -1, -1));
 
         BuscarPalabra.setText("BUSCAR PALABRA");
@@ -92,6 +177,11 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         getContentPane().add(BuscarTodasDFS, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 160, -1, -1));
 
         BuscarTodasBFS.setText("BUSCAR TODAS (BFS)");
+        BuscarTodasBFS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BuscarTodasBFSActionPerformed(evt);
+            }
+        });
         getContentPane().add(BuscarTodasBFS, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 200, -1, -1));
 
         GuardarDiccionario.setText("GUARDAR EN DICCIONARIO");
@@ -131,6 +221,14 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     }
     TextoPalabra.setText("");
     }//GEN-LAST:event_GuardarDiccionarioActionPerformed
+
+    private void BuscarTodasBFSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BuscarTodasBFSActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_BuscarTodasBFSActionPerformed
+
+    private void CargarArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CargarArchivoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CargarArchivoActionPerformed
 
     /**
      * @param args the command line arguments

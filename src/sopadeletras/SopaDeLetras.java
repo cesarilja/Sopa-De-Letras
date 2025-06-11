@@ -18,11 +18,13 @@ public class SopaDeLetras {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String archivo = cargarArchivo();
-        if (archivo != null) {
-            procesarArchivo(archivo);
+    java.awt.EventQueue.invokeLater(new Runnable() {
+        public void run() {
+            new InterfazSopaDeLetras().setVisible(true);
         }
-    }
+    });
+}
+    
 
     private static String cargarArchivo() {
         JFileChooser fileChooser = new JFileChooser();
