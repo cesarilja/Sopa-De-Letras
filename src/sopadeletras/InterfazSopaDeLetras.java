@@ -9,6 +9,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.JFileChooser;       
 import sopadeletras.Diccionario;
 import sopadeletras.Tablero;
@@ -19,7 +21,9 @@ import sopadeletras.Tablero;
  */
 public class InterfazSopaDeLetras extends javax.swing.JFrame {
     private Diccionario diccionario;
-    private Tablero tablero;             
+    private Tablero tablero; 
+    
+
 
     public InterfazSopaDeLetras() {
         initComponents();
@@ -33,6 +37,8 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
             }
         });
     }
+    
+    
 
     private void cargarArchivoActionPerformed(java.awt.event.ActionEvent evt) {
         JFileChooser fileChooser = new JFileChooser();
@@ -68,7 +74,7 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
                     }
 
                     if (leyendoDiccionario && !linea.isEmpty()) {
-                        diccionario.agregarPalabra(linea);
+                       diccionario.agregarPalabra(linea.trim().toUpperCase());
                     }
                     if (leyendoTablero && !linea.isEmpty()) {
                         // Se espera una línea con 16 letras separadas por coma
@@ -85,6 +91,7 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
                         }
                     }
                 }
+                diccionario.mostrarDiccionario();
 
                 tablero = new Tablero(letrasTablero);
 
@@ -196,11 +203,52 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void BuscarPalabraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BuscarPalabraActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BuscarPalabraActionPerformed
+        String palabra = TextoPalabra.getText().trim().toUpperCase();
+    if (palabra.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Por favor, ingrese una palabra para buscar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    if (tablero == null) {
+        JOptionPane.showMessageDialog(this, "Primero cargue un tablero.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    // === Validación con el Diccionario ===
+    if (diccionario == null || !diccionario.contienePalabra(palabra)) {
+        AreaResultado.append("La palabra '" + palabra + "' NO está en el diccionario.\n");
+        return;
+    }
+    // === Búsqueda en el tablero ===
+    long inicio = System.currentTimeMillis();
+    boolean encontrada = tablero.buscarPalabraDFS(palabra);
+    long fin = System.currentTimeMillis();
+    if (encontrada) {
+        AreaResultado.append("Palabra '" + palabra + "' encontrada en el tablero. Tiempo: " + (fin - inicio) + " ms\n");
+    } else {
+        AreaResultado.append("La palabra '" + palabra + "' NO se encuentra en el tablero. Tiempo: " + (fin - inicio) + " ms\n");
+    }
 
+    }//GEN-LAST:event_BuscarPalabraActionPerformed
+    
     private void BuscarTodasDFSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BuscarTodasDFSActionPerformed
-        // TODO add your handling code here:
+                                               
+    if (tablero == null || diccionario == null) {
+        AreaResultado.append("Primero cargue un tablero y un diccionario.\n");
+        return;
+    }
+    long inicio = System.currentTimeMillis();
+    int encontradas = 0;
+    for (String palabra : diccionario.getPalabras()) {
+        boolean encontrada = tablero.buscarPalabraDFS(palabra);
+        if (encontrada) {
+            AreaResultado.append("Palabra '" + palabra + "' encontrada (DFS).\n");
+            encontradas++;
+        } else {
+            AreaResultado.append("Palabra '" + palabra + "' NO encontrada (DFS).\n");
+        }
+    }
+    long fin = System.currentTimeMillis();
+    AreaResultado.append("Total encontradas con DFS: " + encontradas + ". Tiempo: " + (fin - inicio) + " ms\n");
+
     }//GEN-LAST:event_BuscarTodasDFSActionPerformed
 
     private void GuardarDiccionarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GuardarDiccionarioActionPerformed
@@ -223,7 +271,25 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     }//GEN-LAST:event_GuardarDiccionarioActionPerformed
 
     private void BuscarTodasBFSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BuscarTodasBFSActionPerformed
-        // TODO add your handling code here:
+                                              
+    if (tablero == null || diccionario == null) {
+        AreaResultado.append("Primero cargue un tablero y un diccionario.\n");
+        return;
+    }
+    long inicio = System.currentTimeMillis();
+    int encontradas = 0;
+    for (String palabra : diccionario.getPalabras()) {
+        boolean encontrada = tablero.buscarPalabraBFS(palabra);
+        if (encontrada) {
+            AreaResultado.append("Palabra '" + palabra + "' encontrada (BFS).\n");
+            encontradas++;
+        } else {
+            AreaResultado.append("Palabra '" + palabra + "' NO encontrada (BFS).\n");
+        }
+    }
+    long fin = System.currentTimeMillis();
+    AreaResultado.append("Total encontradas con BFS: " + encontradas + ". Tiempo: " + (fin - inicio) + " ms\n");
+
     }//GEN-LAST:event_BuscarTodasBFSActionPerformed
 
     private void CargarArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CargarArchivoActionPerformed

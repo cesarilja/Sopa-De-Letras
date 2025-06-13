@@ -20,7 +20,7 @@ public class Diccionario {
     }
 
     public boolean agregarPalabra(String palabra) {
-    return palabras.add(palabra.toLowerCase());
+    return palabras.add(palabra.toUpperCase());
     }
 
     public boolean contienePalabra(String palabra) {
