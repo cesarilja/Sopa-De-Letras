@@ -58,7 +58,7 @@ public class SopaDeLetras {
                 }
 
             Tablero tablero = new Tablero(letras);
-             tablero.mostrarTablero();
+             System.out.println(tablero.tableroComoTexto());
             System.out.println("Diccionario:");
             diccionario.mostrarDiccionario();
 

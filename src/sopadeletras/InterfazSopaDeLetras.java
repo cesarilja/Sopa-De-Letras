@@ -28,8 +28,11 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     public InterfazSopaDeLetras() {
         initComponents();
         this.diccionario = new Diccionario();
-        this.tablero = null;              
-
+        this.tablero = null;
+        ajustarTablaTablero();
+        
+        tablaTablero.setTableHeader(null);
+        jScrollPane2.setColumnHeaderView(null);
         
         CargarArchivo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -37,6 +40,18 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
             }
         });
     }
+    
+    private void ajustarTablaTablero() {
+    tablaTablero.setTableHeader(null);
+    tablaTablero.setFont(new java.awt.Font("Monospaced", java.awt.Font.BOLD, 32));
+    tablaTablero.setRowHeight(50);
+
+    javax.swing.table.DefaultTableCellRenderer centerRenderer = new javax.swing.table.DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    for (int i = 0; i < tablaTablero.getColumnCount(); i++) {
+        tablaTablero.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+    }
+}
     
     
 
@@ -94,9 +109,10 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
                 diccionario.mostrarDiccionario();
 
                 tablero = new Tablero(letrasTablero);
+                actualizarTableroVisual(letrasTablero);
 
-                // Mostrar tablero en la interfaz
-                AreaTablero.setText(tablero.tableroComoTexto());
+               
+               
                 AreaResultado.setText("Archivo cargado correctamente. Diccionario y tablero listos.\n");
 
             } catch (IOException ex) {
@@ -106,6 +122,11 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
             }
         }
     }
+    private void actualizarTableroVisual(char[][] letras) {
+    for (int i = 0; i < letras.length; i++)
+        for (int j = 0; j < letras[i].length; j++)
+            tablaTablero.setValueAt(String.valueOf(letras[i][j]), i, j);
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -118,8 +139,6 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        AreaTablero = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         AreaResultado = new javax.swing.JTextArea();
@@ -130,6 +149,8 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         BuscarTodasDFS = new javax.swing.JButton();
         BuscarTodasBFS = new javax.swing.JButton();
         GuardarDiccionario = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tablaTablero = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -140,12 +161,6 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         jLabel1.setText("TABLERO DE LETRAS");
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 30, -1, -1));
 
-        AreaTablero.setColumns(20);
-        AreaTablero.setRows(5);
-        jScrollPane1.setViewportView(AreaTablero);
-
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 350, 220));
-
         jLabel2.setText("RESULTADO");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 440, -1, -1));
 
@@ -153,11 +168,11 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         AreaResultado.setRows(5);
         jScrollPane2.setViewportView(AreaResultado);
 
-        getContentPane().add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 390, 280, 110));
+        getContentPane().add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 390, 410, 110));
 
         jLabel3.setText("INGRESE UNA PALABRA");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, -1, -1));
-        getContentPane().add(TextoPalabra, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 180, 30));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 300, -1, -1));
+        getContentPane().add(TextoPalabra, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 180, 30));
 
         CargarArchivo.setText("CARGAR ARCHIVO");
         CargarArchivo.addActionListener(new java.awt.event.ActionListener() {
@@ -199,6 +214,21 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         });
         getContentPane().add(GuardarDiccionario, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 240, -1, -1));
 
+        tablaTablero.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "", "", "", ""
+            }
+        ));
+        jScrollPane3.setViewportView(tablaTablero);
+
+        getContentPane().add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, 300, 210));
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -222,10 +252,13 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     boolean encontrada = tablero.buscarPalabraDFS(palabra);
     long fin = System.currentTimeMillis();
     if (encontrada) {
-        AreaResultado.append("Palabra '" + palabra + "' encontrada en el tablero. Tiempo: " + (fin - inicio) + " ms\n");
-    } else {
-        AreaResultado.append("La palabra '" + palabra + "' NO se encuentra en el tablero. Tiempo: " + (fin - inicio) + " ms\n");
-    }
+    String arbol = tablero.buscarCaminoBFS(palabra);;
+    AreaResultado.append("Palabra '" + palabra + "' encontrada en el tablero.\n");
+    AreaResultado.append("Árbol de búsqueda (camino): " + arbol + "\n");
+    AreaResultado.append("Tiempo: " + (fin - inicio) + " ms\n");
+} else {
+    AreaResultado.append("La palabra '" + palabra + "' NO se encuentra en el tablero. Tiempo: " + (fin - inicio) + " ms\n");
+}
 
     }//GEN-LAST:event_BuscarPalabraActionPerformed
     
@@ -334,7 +367,6 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea AreaResultado;
-    private javax.swing.JTextArea AreaTablero;
     private javax.swing.JButton BuscarPalabra;
     private javax.swing.JButton BuscarTodasBFS;
     private javax.swing.JButton BuscarTodasDFS;
@@ -345,7 +377,8 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTable tablaTablero;
     // End of variables declaration//GEN-END:variables
 }
