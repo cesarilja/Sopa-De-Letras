@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.JFileChooser;       
@@ -21,7 +22,9 @@ import sopadeletras.Tablero;
  */
 public class InterfazSopaDeLetras extends javax.swing.JFrame {
     private Diccionario diccionario;
-    private Tablero tablero; 
+    private Tablero tablero;
+    private File ultimoArchivoCargado = null;
+    private static final String ARCHIVO_ULTIMA_PARTIDA = "ultima_partida.txt";
     
 
 
@@ -30,15 +33,31 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         this.diccionario = new Diccionario();
         this.tablero = null;
         ajustarTablaTablero();
+        cargarUltimaPartidaGuardada(); // Intenta leer la ruta guardada al iniciar
         
         tablaTablero.setTableHeader(null);
         jScrollPane2.setColumnHeaderView(null);
         
-        CargarArchivo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cargarArchivoActionPerformed(evt);
-            }
-        });
+    }
+    private void guardarUltimaPartida(File archivo) {
+        try (PrintWriter out = new PrintWriter(ARCHIVO_ULTIMA_PARTIDA)) {
+            out.println(archivo.getAbsolutePath());
+        } catch (IOException e) {}
+    }
+    
+    private void cargarUltimaPartidaGuardada() {
+        File archivoUltimaPartida = new File(ARCHIVO_ULTIMA_PARTIDA);
+        if (archivoUltimaPartida.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(archivoUltimaPartida))) {
+                String path = br.readLine();
+                if (path != null && !path.isEmpty()) {
+                    File archivo = new File(path);
+                    if (archivo.exists()) {
+                        ultimoArchivoCargado = archivo;
+                    }
+                }
+            } catch (IOException e) {}
+        }
     }
     
     private void ajustarTablaTablero() {
@@ -52,76 +71,91 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         tablaTablero.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
     }
 }
+    private void reiniciarPrograma() {
+    // Limpiar tablero visual
+    int filas = 4, columnas = 4;
+    javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tablaTablero.getModel();
+    modelo.setRowCount(filas);
+    modelo.setColumnCount(columnas);
+    for (int i = 0; i < filas; i++) {
+        for (int j = 0; j < columnas; j++) {
+            modelo.setValueAt("", i, j);
+        }
+    }
+
+    // Limpiar área de resultado
+    AreaResultado.setText("");
+
+    // Limpiar campo de texto de palabra
+    TextoPalabra.setText("");
+
+    // Limpiar diccionario y tablero en memoria
+    diccionario = new Diccionario();
+    tablero = null;
+}
     
-    
+    private boolean cargarArchivoDesdeRuta(File archivo) {
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            boolean leyendoDiccionario = false;
+            boolean leyendoTablero = false;
+            diccionario = new Diccionario();
+            char[][] letrasTablero = new char[4][4];
 
-    private void cargarArchivoActionPerformed(java.awt.event.ActionEvent evt) {
-        JFileChooser fileChooser = new JFileChooser();
-        int result = fileChooser.showOpenDialog(this);
+            while ((linea = br.readLine()) != null) {
+                linea = linea.trim();
+                if (linea.equalsIgnoreCase("dic")) {
+                    leyendoDiccionario = true;
+                    continue;
+                }
+                if (linea.equalsIgnoreCase("/dic")) {
+                    leyendoDiccionario = false;
+                    continue;
+                }
+                if (linea.equalsIgnoreCase("tab")) {
+                    leyendoTablero = true;
+                    continue;
+                }
+                if (linea.equalsIgnoreCase("/tab")) {
+                    leyendoTablero = false;
+                    continue;
+                }
 
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File archivo = fileChooser.getSelectedFile();
-            try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-                String linea;
-                boolean leyendoDiccionario = false;
-                boolean leyendoTablero = false;
-                diccionario = new Diccionario();
-                char[][] letrasTablero = new char[4][4];
-                int filaTablero = 0;
-
-                while ((linea = br.readLine()) != null) {
-                    linea = linea.trim();
-                    if (linea.equalsIgnoreCase("dic")) {
-                        leyendoDiccionario = true;
-                        continue;
+                if (leyendoDiccionario && !linea.isEmpty()) {
+                   diccionario.agregarPalabra(linea.trim().toUpperCase());
+                }
+                if (leyendoTablero && !linea.isEmpty()) {
+                    // Se espera una línea con 16 letras separadas por coma
+                    String[] letras = linea.split(",");
+                    if (letras.length != 16) {
+                        JOptionPane.showMessageDialog(this, "Error: El tablero debe tener 16 letras.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return false;
                     }
-                    if (linea.equalsIgnoreCase("/dic")) {
-                        leyendoDiccionario = false;
-                        continue;
-                    }
-                    if (linea.equalsIgnoreCase("tab")) {
-                        leyendoTablero = true;
-                        continue;
-                    }
-                    if (linea.equalsIgnoreCase("/tab")) {
-                        leyendoTablero = false;
-                        continue;
-                    }
-
-                    if (leyendoDiccionario && !linea.isEmpty()) {
-                       diccionario.agregarPalabra(linea.trim().toUpperCase());
-                    }
-                    if (leyendoTablero && !linea.isEmpty()) {
-                        // Se espera una línea con 16 letras separadas por coma
-                        String[] letras = linea.split(",");
-                        if (letras.length != 16) {
-                            JOptionPane.showMessageDialog(this, "Error: El tablero debe tener 16 letras.", "Error", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                        int idx = 0;
-                        for (int i = 0; i < 4; i++) {
-                            for (int j = 0; j < 4; j++) {
-                                letrasTablero[i][j] = letras[idx++].trim().charAt(0);
-                            }
+                    int idx = 0;
+                    for (int i = 0; i < 4; i++) {
+                        for (int j = 0; j < 4; j++) {
+                            letrasTablero[i][j] = letras[idx++].trim().charAt(0);
                         }
                     }
                 }
-                diccionario.mostrarDiccionario();
-
-                tablero = new Tablero(letrasTablero);
-                actualizarTableroVisual(letrasTablero);
-
-               
-               
-                AreaResultado.setText("Archivo cargado correctamente. Diccionario y tablero listos.\n");
-
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(this, "Error al leer el archivo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error en el formato del archivo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
+            diccionario.mostrarDiccionario();
+
+            tablero = new Tablero(letrasTablero);
+            actualizarTableroVisual(letrasTablero);
+
+            AreaResultado.setText("Archivo cargado correctamente. Diccionario y tablero listos.\n");
+            return true;
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Error al leer el archivo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error en el formato del archivo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+        return false;
     }
+
+    
     private void actualizarTableroVisual(char[][] letras) {
     for (int i = 0; i < letras.length; i++)
         for (int j = 0; j < letras[i].length; j++)
@@ -151,6 +185,8 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         GuardarDiccionario = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         tablaTablero = new javax.swing.JTable();
+        cargarUltimaPartida = new javax.swing.JButton();
+        Reiniciar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -228,6 +264,22 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         jScrollPane3.setViewportView(tablaTablero);
 
         getContentPane().add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, 300, 210));
+
+        cargarUltimaPartida.setText("CARGAR ULTIMO ARCHIVO ");
+        cargarUltimaPartida.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cargarUltimaPartidaActionPerformed(evt);
+            }
+        });
+        getContentPane().add(cargarUltimaPartida, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 280, -1, -1));
+
+        Reiniciar.setText("REINICIAR");
+        Reiniciar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ReiniciarActionPerformed(evt);
+            }
+        });
+        getContentPane().add(Reiniciar, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 440, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -326,8 +378,31 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     }//GEN-LAST:event_BuscarTodasBFSActionPerformed
 
     private void CargarArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CargarArchivoActionPerformed
-        // TODO add your handling code here:
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(this);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File archivo = fileChooser.getSelectedFile();
+            if (cargarArchivoDesdeRuta(archivo)) {
+                ultimoArchivoCargado = archivo;
+                guardarUltimaPartida(archivo);
+            }
+        }
+    
     }//GEN-LAST:event_CargarArchivoActionPerformed
+
+    private void cargarUltimaPartidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cargarUltimaPartidaActionPerformed
+        if (ultimoArchivoCargado != null && ultimoArchivoCargado.exists()) {
+            cargarArchivoDesdeRuta(ultimoArchivoCargado);
+        } else {
+            JOptionPane.showMessageDialog(this, "No hay partida guardada para cargar.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+        }
+    
+    }//GEN-LAST:event_cargarUltimaPartidaActionPerformed
+
+    private void ReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReiniciarActionPerformed
+        reiniciarPrograma();
+    }//GEN-LAST:event_ReiniciarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -372,7 +447,9 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     private javax.swing.JButton BuscarTodasDFS;
     private javax.swing.JButton CargarArchivo;
     private javax.swing.JButton GuardarDiccionario;
+    private javax.swing.JButton Reiniciar;
     private javax.swing.JTextField TextoPalabra;
+    private javax.swing.JButton cargarUltimaPartida;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
