@@ -15,6 +15,9 @@ import java.util.Set;
 import javax.swing.JFileChooser;       
 import sopadeletras.Diccionario;
 import sopadeletras.Tablero;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
+import sopadeletras.ResaltadoRenderer;
 
 /**
  *
@@ -160,6 +163,26 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     for (int i = 0; i < letras.length; i++)
         for (int j = 0; j < letras[i].length; j++)
             tablaTablero.setValueAt(String.valueOf(letras[i][j]), i, j);
+}
+    
+    private Set<Point> posicionesResaltadas = new HashSet<>();
+    private void buscarYResaltarPalabra() {
+    String palabra = TextoPalabra.getText().trim().toUpperCase();
+    Set<Point> posiciones = tablero.buscarPalabraPosiciones(palabra);
+
+    if (!posiciones.isEmpty()) {
+        posicionesResaltadas = posiciones;
+        AreaResultado.append("¡Palabra encontrada!\n");
+    } else {
+        posicionesResaltadas.clear();
+        AreaResultado.append("Palabra NO encontrada.\n");
+    }
+
+    ResaltadoRenderer renderer = new ResaltadoRenderer(posicionesResaltadas);
+    for (int i = 0; i < tablaTablero.getColumnCount(); i++) {
+        tablaTablero.getColumnModel().getColumn(i).setCellRenderer(renderer);
+    }
+    tablaTablero.repaint();
 }
 
     /**
@@ -311,7 +334,9 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
 } else {
     AreaResultado.append("La palabra '" + palabra + "' NO se encuentra en el tablero. Tiempo: " + (fin - inicio) + " ms\n");
 }
-
+     buscarYResaltarPalabra();
+     
+    
     }//GEN-LAST:event_BuscarPalabraActionPerformed
     
     private void BuscarTodasDFSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BuscarTodasDFSActionPerformed
@@ -388,6 +413,7 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
                 guardarUltimaPartida(archivo);
             }
         }
+        
     
     }//GEN-LAST:event_CargarArchivoActionPerformed
 
@@ -397,6 +423,12 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "No hay partida guardada para cargar.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
         }
+        ResaltadoRenderer renderer = new ResaltadoRenderer(posicionesResaltadas);
+            for (int i = 0; i < tablaTablero.getColumnCount(); i++) {
+            tablaTablero.getColumnModel().getColumn(i).setCellRenderer(renderer);
+        }
+        tablaTablero.repaint();
+        
     
     }//GEN-LAST:event_cargarUltimaPartidaActionPerformed
 

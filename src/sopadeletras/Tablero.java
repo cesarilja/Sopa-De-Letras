@@ -8,7 +8,10 @@ package sopadeletras;
  *
  * @author Dell
  */
+import java.awt.Point;
 import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Tablero {
     private char[][] letras; // Matriz 4x4
@@ -188,4 +191,46 @@ public class Tablero {
             this.visitados = visitados;
         }
     }
+    
+    public Set<Point> buscarPalabraPosiciones(String palabra) {
+    int n = letras.length, m = letras[0].length;
+    boolean[][] visitado = new boolean[n][m];
+    Set<Point> resultado = new HashSet<>();
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (dfsPos(i, j, palabra, 0, visitado, resultado)) {
+                return new HashSet<>(resultado); // copia para evitar efectos colaterales
+            }
+            resultado.clear();
+        }
+    }
+    return new HashSet<>(); // Si no se encuentra, retorna vacío
+}
+
+private boolean dfsPos(int x, int y, String palabra, int idx, boolean[][] visitado, Set<Point> path) {
+    int n = letras.length, m = letras[0].length;
+    if (idx >= palabra.length()) return false;
+    if (x < 0 || x >= n || y < 0 || y >= m) return false;
+    if (visitado[x][y]) return false;
+    if (letras[x][y] != palabra.charAt(idx)) return false;
+
+    path.add(new Point(x, y));
+    visitado[x][y] = true;
+    if (idx == palabra.length() - 1) {
+        visitado[x][y] = false;
+        return true;
+    }
+
+    int[] dx = {-1, -1, -1, 0, 0, 1, 1, 1};
+    int[] dy = {-1, 0, 1, -1, 1, -1, 0, 1};
+    for (int d = 0; d < 8; d++) {
+        if (dfsPos(x + dx[d], y + dy[d], palabra, idx + 1, visitado, path)) {
+            visitado[x][y] = false;
+            return true;
+        }
+    }
+    path.remove(new Point(x, y));
+    visitado[x][y] = false;
+    return false;
+}
 }
