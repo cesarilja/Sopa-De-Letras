@@ -1,5 +1,12 @@
 package sopadeletras;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import sopadeletras.Fondo1Panel;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -16,8 +23,36 @@ public class InterfazInicio extends javax.swing.JFrame {
      */
     public InterfazInicio() {
         initComponents();
-        setLocationRelativeTo(null);
-    }
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setLocationRelativeTo(null);
+    setTitle("Sopa de Letras");
+
+    Fondo1Panel fondo = new Fondo1Panel();
+    fondo.setLayout(new GridBagLayout());
+
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.anchor = GridBagConstraints.CENTER;
+    gbc.insets = new java.awt.Insets(80, 0, 0, 0); 
+
+    JButton BotonInicio = new JButton("START");
+    fondo.add(BotonInicio, gbc);
+
+    // Acción al presionar el botón
+    BotonInicio.addActionListener(new java.awt.event.ActionListener() {
+        @Override
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            InterfazSeleccionarModo seleccion = new InterfazSeleccionarModo();
+            seleccion.setVisible(true);
+            dispose(); 
+        }
+        });
+
+        setContentPane(fondo);
+        setSize(600, 500);
+        setVisible(true);
+        }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -28,47 +63,16 @@ public class InterfazInicio extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        BotonInicio = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        fondo1Panel1 = new sopadeletras.Fondo1Panel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 50, -1, -1));
-
-        jLabel1.setText("SOPA DE LETRAS");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 80, -1, -1));
-
-        BotonInicio.setText("INICIAR");
-        BotonInicio.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BotonInicioActionPerformed(evt);
-            }
-        });
-        getContentPane().add(BotonInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 150, -1, -1));
-
-        jLabel2.setText("Cesar Ilja");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 230, -1, -1));
-
-        jLabel3.setText("Santiago Salazar");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 250, -1, -1));
-
-        jLabel4.setText("Alejandro Simanca");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 270, -1, -1));
+        fondo1Panel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        getContentPane().add(fondo1Panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 400, 300));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void BotonInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonInicioActionPerformed
-    InterfazSeleccionarModo seleccion = new InterfazSeleccionarModo();
-    seleccion.setVisible(true);
-    this.dispose();
-    }//GEN-LAST:event_BotonInicioActionPerformed
 
     /**
      * @param args the command line arguments
@@ -106,11 +110,6 @@ public class InterfazInicio extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton BotonInicio;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JPanel jPanel1;
+    private sopadeletras.Fondo1Panel fondo1Panel1;
     // End of variables declaration//GEN-END:variables
 }

@@ -4,6 +4,12 @@
  */
 package sopadeletras;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import sopadeletras.FondoSeleccionarModoPanel;
 import sopadeletras.InterfazSopaDeLetras;
 
 /**
@@ -17,9 +23,48 @@ public class InterfazSeleccionarModo extends javax.swing.JFrame {
      */
     public InterfazSeleccionarModo() {
         initComponents();
-        setSize(400, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Seleccionar Modo");
         setLocationRelativeTo(null);
+
+        FondoSeleccionarModoPanel fondo = new FondoSeleccionarModoPanel();
+        fondo.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(80, 0, 10, 0);
+
+        // Botón: Cargar Partida Nueva
+        JButton btnNueva = new JButton("CARGAR PARTIDA NUEVA");
+        fondo.add(btnNueva, gbc);
+
+        // Botón: Cargar Última Partida
+        gbc.gridy = 1;
+        gbc.insets = new Insets(10, 0, 0, 0);
+        JButton btnUltima = new JButton("CARGAR ULTIMA PARTIDA");
+        fondo.add(btnUltima, gbc);
+
+        // Acciones
+        btnNueva.addActionListener(evt -> {
+            InterfazSopaDeLetras sopa = new InterfazSopaDeLetras();
+            sopa.setVisible(true);
+            sopa.mostrarDialogoCargarArchivo();
+            dispose();
+        });
+
+        btnUltima.addActionListener(evt -> {
+            InterfazSopaDeLetras sopa = new InterfazSopaDeLetras();
+            sopa.setVisible(true);
+            sopa.cargarUltimaPartida();
+            dispose();
+        });
+
+        setContentPane(fondo);
+        setSize(600, 500);
+        setVisible(true);
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
