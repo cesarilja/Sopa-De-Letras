@@ -85,6 +85,9 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
             modelo.setValueAt("", i, j);
         }
     }
+    
+
+   
 
     // Limpiar área de resultado
     AreaResultado.setText("");
@@ -184,6 +187,39 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     }
     tablaTablero.repaint();
 }
+    public void mostrarDialogoCargarArchivo() {
+    CargarArchivoActionPerformed(null);
+    }
+
+    public void cargarUltimaPartida() {
+    cargarUltimaPartidaActionPerformed(null);
+    }
+    private void cargarUltimaPartidaActionPerformed(java.awt.event.ActionEvent evt) {                                                    
+        if (ultimoArchivoCargado != null && ultimoArchivoCargado.exists()) {
+            cargarArchivoDesdeRuta(ultimoArchivoCargado);
+        } else {
+            JOptionPane.showMessageDialog(this, "No hay partida guardada para cargar.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+        }
+        ResaltadoRenderer renderer = new ResaltadoRenderer(posicionesResaltadas);
+        for (int i = 0; i < tablaTablero.getColumnCount(); i++) {
+            tablaTablero.getColumnModel().getColumn(i).setCellRenderer(renderer);
+        }
+        tablaTablero.repaint();
+    }  
+    private void CargarArchivoActionPerformed(java.awt.event.ActionEvent evt) {                                              
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(this);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File archivo = fileChooser.getSelectedFile();
+            if (cargarArchivoDesdeRuta(archivo)) {
+                ultimoArchivoCargado = archivo;
+                guardarUltimaPartida(archivo);
+            }
+        }
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -201,14 +237,12 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         AreaResultado = new javax.swing.JTextArea();
         jLabel3 = new javax.swing.JLabel();
         TextoPalabra = new javax.swing.JTextField();
-        CargarArchivo = new javax.swing.JButton();
         BuscarPalabra = new javax.swing.JButton();
         BuscarTodasDFS = new javax.swing.JButton();
         BuscarTodasBFS = new javax.swing.JButton();
         GuardarDiccionario = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         tablaTablero = new javax.swing.JTable();
-        cargarUltimaPartida = new javax.swing.JButton();
         Reiniciar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -233,21 +267,13 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 300, -1, -1));
         getContentPane().add(TextoPalabra, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 180, 30));
 
-        CargarArchivo.setText("CARGAR ARCHIVO");
-        CargarArchivo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CargarArchivoActionPerformed(evt);
-            }
-        });
-        getContentPane().add(CargarArchivo, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 80, -1, -1));
-
         BuscarPalabra.setText("BUSCAR PALABRA");
         BuscarPalabra.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BuscarPalabraActionPerformed(evt);
             }
         });
-        getContentPane().add(BuscarPalabra, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 120, -1, -1));
+        getContentPane().add(BuscarPalabra, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 320, -1, -1));
 
         BuscarTodasDFS.setText("BUSCAR TODAS  (DFS)");
         BuscarTodasDFS.addActionListener(new java.awt.event.ActionListener() {
@@ -255,7 +281,7 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
                 BuscarTodasDFSActionPerformed(evt);
             }
         });
-        getContentPane().add(BuscarTodasDFS, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 160, -1, -1));
+        getContentPane().add(BuscarTodasDFS, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 100, -1, -1));
 
         BuscarTodasBFS.setText("BUSCAR TODAS (BFS)");
         BuscarTodasBFS.addActionListener(new java.awt.event.ActionListener() {
@@ -263,7 +289,7 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
                 BuscarTodasBFSActionPerformed(evt);
             }
         });
-        getContentPane().add(BuscarTodasBFS, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 200, -1, -1));
+        getContentPane().add(BuscarTodasBFS, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 150, -1, -1));
 
         GuardarDiccionario.setText("GUARDAR EN DICCIONARIO");
         GuardarDiccionario.addActionListener(new java.awt.event.ActionListener() {
@@ -271,7 +297,7 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
                 GuardarDiccionarioActionPerformed(evt);
             }
         });
-        getContentPane().add(GuardarDiccionario, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 240, -1, -1));
+        getContentPane().add(GuardarDiccionario, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 200, -1, -1));
 
         tablaTablero.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -287,14 +313,6 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         jScrollPane3.setViewportView(tablaTablero);
 
         getContentPane().add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, 300, 210));
-
-        cargarUltimaPartida.setText("CARGAR ULTIMO ARCHIVO ");
-        cargarUltimaPartida.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cargarUltimaPartidaActionPerformed(evt);
-            }
-        });
-        getContentPane().add(cargarUltimaPartida, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 280, -1, -1));
 
         Reiniciar.setText("REINICIAR");
         Reiniciar.addActionListener(new java.awt.event.ActionListener() {
@@ -402,36 +420,6 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
 
     }//GEN-LAST:event_BuscarTodasBFSActionPerformed
 
-    private void CargarArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CargarArchivoActionPerformed
-        JFileChooser fileChooser = new JFileChooser();
-        int result = fileChooser.showOpenDialog(this);
-
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File archivo = fileChooser.getSelectedFile();
-            if (cargarArchivoDesdeRuta(archivo)) {
-                ultimoArchivoCargado = archivo;
-                guardarUltimaPartida(archivo);
-            }
-        }
-        
-    
-    }//GEN-LAST:event_CargarArchivoActionPerformed
-
-    private void cargarUltimaPartidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cargarUltimaPartidaActionPerformed
-        if (ultimoArchivoCargado != null && ultimoArchivoCargado.exists()) {
-            cargarArchivoDesdeRuta(ultimoArchivoCargado);
-        } else {
-            JOptionPane.showMessageDialog(this, "No hay partida guardada para cargar.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
-        }
-        ResaltadoRenderer renderer = new ResaltadoRenderer(posicionesResaltadas);
-            for (int i = 0; i < tablaTablero.getColumnCount(); i++) {
-            tablaTablero.getColumnModel().getColumn(i).setCellRenderer(renderer);
-        }
-        tablaTablero.repaint();
-        
-    
-    }//GEN-LAST:event_cargarUltimaPartidaActionPerformed
-
     private void ReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReiniciarActionPerformed
         reiniciarPrograma();
     }//GEN-LAST:event_ReiniciarActionPerformed
@@ -477,11 +465,9 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     private javax.swing.JButton BuscarPalabra;
     private javax.swing.JButton BuscarTodasBFS;
     private javax.swing.JButton BuscarTodasDFS;
-    private javax.swing.JButton CargarArchivo;
     private javax.swing.JButton GuardarDiccionario;
     private javax.swing.JButton Reiniciar;
     private javax.swing.JTextField TextoPalabra;
-    private javax.swing.JButton cargarUltimaPartida;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

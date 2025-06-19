@@ -20,9 +20,10 @@ public class SopaDeLetras {
     public static void main(String[] args) {
     java.awt.EventQueue.invokeLater(new Runnable() {
         public void run() {
-            new InterfazSopaDeLetras().setVisible(true);
+            new InterfazInicio().setVisible(true);
         }
     });
+
 }
     
 
