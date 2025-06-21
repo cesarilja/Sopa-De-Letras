@@ -13,18 +13,22 @@ import java.util.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Tablero {
-    private char[][] letras; // Matriz 4x4
 
-    public Tablero(char[][] letras) {
+/**
+ * Clase que representa el tablero de la Sopa de Letras y permite búsquedas.
+ */
+    public class Tablero {
+        private char[][] letras; // Matriz 4x4
+
+        public Tablero(char[][] letras) {
         this.letras = letras;
-    }
+        }
 
-    public char[][] getLetras() {
+        public char[][] getLetras() {
         return letras;
-    }
+        }
 
-    // Mostrar el tablero como texto
+    //Devuelve el tablero como un String para mostrarlo en consola
     public String tableroComoTexto() {
         StringBuilder sb = new StringBuilder();
         for (char[] fila : letras) {
@@ -36,7 +40,7 @@ public class Tablero {
         return sb.toString();
     }
 
-    // --- DFS (para sí/no) ---
+    //DFS (para sí/no): busca si existe la palabra en el tablero
     public boolean buscarPalabraDFS(String palabra) {
         int n = letras.length, m = letras[0].length;
         boolean[][] visitado = new boolean[n][m];
@@ -47,7 +51,7 @@ public class Tablero {
         return false;
     }
 
-    // --- DFS (para camino/arbol) ---
+    //DFS (para camino/arbol): devuelve el camino si existe
     public String buscarCaminoDFS(String palabra) {
         int n = letras.length, m = letras[0].length;
         boolean[][] visitado = new boolean[n][m];
@@ -57,6 +61,10 @@ public class Tablero {
                     return caminoEncontrado;
         return null;
     }
+    
+    /**
+     * Búsqueda recursiva DFS básica.
+     */
     private boolean dfs(int x, int y, String palabra, int idx, boolean[][] visitado) {
     int n = letras.length, m = letras[0].length;
     if (idx >= palabra.length()) return false;
@@ -79,6 +87,8 @@ public class Tablero {
 }
 
     private String caminoEncontrado = null;
+    
+    //DFS recursivo que construye el camino si se encuentra la palabra.
     private boolean buscarCaminoDFSRec(int x, int y, String palabra, int idx, boolean[][] visitado, String camino) {
         int n = letras.length, m = letras[0].length;
         if (idx >= palabra.length()) return false;
@@ -99,7 +109,7 @@ public class Tablero {
         return false;
     }
 
-    // --- BFS (para sí/no) ---
+    // BFS (para sí/no): busca si existe la palabra en el tablero
     public boolean buscarPalabraBFS(String palabra) {
         int N = letras.length, M = letras[0].length, len = palabra.length();
         int[] dx = {-1, -1, -1, 0, 0, 1, 1, 1};
@@ -131,7 +141,7 @@ public class Tablero {
         return false;
     }
 
-    // --- BFS (para camino/arbol) ---
+    //BFS (para camino/arbol): devuelve el camino si existe
     public String buscarCaminoBFS(String palabra) {
         int N = letras.length, M = letras[0].length, len = palabra.length();
         int[] dx = {-1, -1, -1, 0, 0, 1, 1, 1};
@@ -165,7 +175,7 @@ public class Tablero {
         return null;
     }
 
-    // --- Utilidades internas ---
+    //Utilidad para clonar la matriz de 'visitados'
     private boolean[][] copiarMatriz(boolean[][] matriz) {
         boolean[][] copia = new boolean[matriz.length][matriz[0].length];
         for (int i = 0; i < matriz.length; i++)
@@ -173,6 +183,7 @@ public class Tablero {
         return copia;
     }
 
+    // Nodos auxiliares para BFS
     private static class BFSNode {
         int x, y, idx;
         boolean[][] visitados;
@@ -192,6 +203,7 @@ public class Tablero {
         }
     }
     
+    //Busca una palabra y retorna las posiciones de la ruta encontrada.
     public Set<Point> buscarPalabraPosiciones(String palabra) {
     int n = letras.length, m = letras[0].length;
     boolean[][] visitado = new boolean[n][m];
@@ -207,30 +219,34 @@ public class Tablero {
     return new HashSet<>(); // Si no se encuentra, retorna vacío
 }
 
-private boolean dfsPos(int x, int y, String palabra, int idx, boolean[][] visitado, Set<Point> path) {
-    int n = letras.length, m = letras[0].length;
-    if (idx >= palabra.length()) return false;
-    if (x < 0 || x >= n || y < 0 || y >= m) return false;
-    if (visitado[x][y]) return false;
-    if (letras[x][y] != palabra.charAt(idx)) return false;
+    
+    /**
+     * DFS auxiliar para buscar todas las posiciones de una palabra.
+     */
+    private boolean dfsPos(int x, int y, String palabra, int idx, boolean[][] visitado, Set<Point> path) {
+        int n = letras.length, m = letras[0].length;
+        if (idx >= palabra.length()) return false;
+        if (x < 0 || x >= n || y < 0 || y >= m) return false;
+        if (visitado[x][y]) return false;
+        if (letras[x][y] != palabra.charAt(idx)) return false;
 
-    path.add(new Point(x, y));
-    visitado[x][y] = true;
-    if (idx == palabra.length() - 1) {
-        visitado[x][y] = false;
-        return true;
-    }
+        path.add(new Point(x, y));
+        visitado[x][y] = true;
+        if (idx == palabra.length() - 1) {
+            visitado[x][y] = false;
+            return true;
+            }
 
-    int[] dx = {-1, -1, -1, 0, 0, 1, 1, 1};
-    int[] dy = {-1, 0, 1, -1, 1, -1, 0, 1};
-    for (int d = 0; d < 8; d++) {
+        int[] dx = {-1, -1, -1, 0, 0, 1, 1, 1};
+        int[] dy = {-1, 0, 1, -1, 1, -1, 0, 1};
+        for (int d = 0; d < 8; d++) {
         if (dfsPos(x + dx[d], y + dy[d], palabra, idx + 1, visitado, path)) {
             visitado[x][y] = false;
             return true;
+            }
         }
+        path.remove(new Point(x, y));
+        visitado[x][y] = false;
+        return false;
     }
-    path.remove(new Point(x, y));
-    visitado[x][y] = false;
-    return false;
-}
-}
+    }

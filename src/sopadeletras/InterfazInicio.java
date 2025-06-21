@@ -16,6 +16,11 @@ import sopadeletras.Fondo1Panel;
  *
  * @author Dell
  */
+
+/**
+ * Ventana inicial de la aplicación.
+ * Muestra el botón principal para iniciar el juego.
+ */
 public class InterfazInicio extends javax.swing.JFrame {
 
     /**

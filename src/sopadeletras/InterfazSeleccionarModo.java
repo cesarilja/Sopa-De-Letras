@@ -16,6 +16,12 @@ import sopadeletras.InterfazSopaDeLetras;
  *
  * @author Dell
  */
+
+/**
+ * Pantalla para seleccionar el modo de juego:
+ * - Cargar nueva partida
+ * - Cargar última partida guardada
+ */
 public class InterfazSeleccionarModo extends javax.swing.JFrame {
 
     /**

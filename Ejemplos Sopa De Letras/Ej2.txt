@@ -1,0 +1,10 @@
+dic
+CASA
+SOL
+LUNA
+RIO
+LOSA
+/dic
+tab
+C,A,S,A,S,O,L,E,L,U,N,A,R,I,O,S
+/tab

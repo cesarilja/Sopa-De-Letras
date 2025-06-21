@@ -12,6 +12,11 @@ import javax.swing.SwingConstants;
  *
  * @author Dell
  */
+
+/**
+ * Renderer personalizado para resaltar celdas del JTable
+ * según las posiciones encontradas de una palabra.
+ */
 public class ResaltadoRenderer extends DefaultTableCellRenderer {
     private Set<Point> posicionesResaltadas;
 

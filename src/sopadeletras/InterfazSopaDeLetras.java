@@ -23,6 +23,10 @@ import sopadeletras.ResaltadoRenderer;
  *
  * @author Dell
  */
+
+/**
+ * Ventana principal del juego de Sopa de Letras.
+ */
 public class InterfazSopaDeLetras extends javax.swing.JFrame {
     private Diccionario diccionario;
     private Tablero tablero;
@@ -42,12 +46,15 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         jScrollPane2.setColumnHeaderView(null);
         
     }
+    
+    //Guarda la ruta del archivo de la última partida en disco
     private void guardarUltimaPartida(File archivo) {
         try (PrintWriter out = new PrintWriter(ARCHIVO_ULTIMA_PARTIDA)) {
             out.println(archivo.getAbsolutePath());
         } catch (IOException e) {}
     }
     
+    //Intenta cargar la ruta de la última partida guardada
     private void cargarUltimaPartidaGuardada() {
         File archivoUltimaPartida = new File(ARCHIVO_ULTIMA_PARTIDA);
         if (archivoUltimaPartida.exists()) {
@@ -63,6 +70,7 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         }
     }
     
+    //Ajusta el formato visual del JTable del tablero
     private void ajustarTablaTablero() {
     tablaTablero.setTableHeader(null);
     tablaTablero.setFont(new java.awt.Font("Monospaced", java.awt.Font.BOLD, 32));
@@ -73,7 +81,8 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     for (int i = 0; i < tablaTablero.getColumnCount(); i++) {
         tablaTablero.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
     }
-}
+}   
+    //Limpia todos los datos y la interfaz, para reiniciar el juego.
     private void reiniciarPrograma() {
     // Limpiar tablero visual
     int filas = 4, columnas = 4;
@@ -100,6 +109,11 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     tablero = null;
 }
     
+    /**
+     * Carga archivo de partida desde ruta y construye diccionario y tablero.
+     * @param archivo Archivo a leer.
+     * @return true si se cargó correctamente.
+     */
     private boolean cargarArchivoDesdeRuta(File archivo) {
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
             String linea;
@@ -161,7 +175,7 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         return false;
     }
 
-    
+    //Actualiza el JTable del tablero con las letras cargadas.
     private void actualizarTableroVisual(char[][] letras) {
     for (int i = 0; i < letras.length; i++)
         for (int j = 0; j < letras[i].length; j++)
@@ -169,6 +183,7 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
 }
     
     private Set<Point> posicionesResaltadas = new HashSet<>();
+    //Busca la palabra ingresada en el tablero y resalta posiciones
     private void buscarYResaltarPalabra() {
     String palabra = TextoPalabra.getText().trim().toUpperCase();
     Set<Point> posiciones = tablero.buscarPalabraPosiciones(palabra);
@@ -187,6 +202,11 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     }
     tablaTablero.repaint();
 }
+    
+     /** 
+     * Muestra el diálogo para cargar un archivo. 
+     * Se llama desde otras pantallas.
+     */
     public void mostrarDialogoCargarArchivo() {
     CargarArchivoActionPerformed(null);
     }
@@ -194,6 +214,8 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
     public void cargarUltimaPartida() {
     cargarUltimaPartidaActionPerformed(null);
     }
+    
+    //Acción: cargar última partida mediante menú o botón
     private void cargarUltimaPartidaActionPerformed(java.awt.event.ActionEvent evt) {                                                    
         if (ultimoArchivoCargado != null && ultimoArchivoCargado.exists()) {
             cargarArchivoDesdeRuta(ultimoArchivoCargado);
@@ -206,18 +228,27 @@ public class InterfazSopaDeLetras extends javax.swing.JFrame {
         }
         tablaTablero.repaint();
     }  
-    private void CargarArchivoActionPerformed(java.awt.event.ActionEvent evt) {                                              
-        JFileChooser fileChooser = new JFileChooser();
-        int result = fileChooser.showOpenDialog(this);
+    
+    //Acción: muestra diálogo para seleccionar archivo y cargarlo.
+    private void CargarArchivoActionPerformed(java.awt.event.ActionEvent evt) {
+    JFileChooser fileChooser = new JFileChooser();
+    // Mostrar solo archivos .txt
+    fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Archivos de texto (*.txt)", "txt"));
+    int result = fileChooser.showOpenDialog(this);
 
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File archivo = fileChooser.getSelectedFile();
-            if (cargarArchivoDesdeRuta(archivo)) {
-                ultimoArchivoCargado = archivo;
-                guardarUltimaPartida(archivo);
-            }
+    if (result == JFileChooser.APPROVE_OPTION) {
+        File archivo = fileChooser.getSelectedFile();
+        // Validación extra por si el usuario fuerza la extensión
+        if (!archivo.getName().toLowerCase().endsWith(".txt")) {
+            JOptionPane.showMessageDialog(this, "Solo se permiten archivos con extensión .txt", "Archivo no válido", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (cargarArchivoDesdeRuta(archivo)) {
+            ultimoArchivoCargado = archivo;
+            guardarUltimaPartida(archivo);
         }
     }
+}
     
     
 

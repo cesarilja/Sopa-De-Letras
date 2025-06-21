@@ -4,6 +4,7 @@
  */
 package sopadeletras;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import javax.swing.*;
@@ -12,11 +13,16 @@ import javax.swing.*;
  *
  * @author Dell
  */
+
+/**
+ * Clase principal que inicia la aplicación de Sopa de Letras.
+ */
 public class SopaDeLetras {
 
     /**
      * @param args the command line arguments
      */
+    //Despliega la ventana inicial
     public static void main(String[] args) {
     java.awt.EventQueue.invokeLater(new Runnable() {
         public void run() {
@@ -26,16 +32,22 @@ public class SopaDeLetras {
 
 }
     
-
     private static String cargarArchivo() {
-        JFileChooser fileChooser = new JFileChooser();
-        int resultado = fileChooser.showOpenDialog(null);
-        if (resultado == JFileChooser.APPROVE_OPTION) {
-          return fileChooser.getSelectedFile().getAbsolutePath();
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Archivos de texto (*.txt)", "txt"));
+    int resultado = fileChooser.showOpenDialog(null);
+    if (resultado == JFileChooser.APPROVE_OPTION) {
+        File archivo = fileChooser.getSelectedFile();
+        if (!archivo.getName().toLowerCase().endsWith(".txt")) {
+            JOptionPane.showMessageDialog(null, "Solo se permiten archivos con extensión .txt", "Archivo no válido", JOptionPane.ERROR_MESSAGE);
+            return null;
         }
-        return null;
+        return archivo.getAbsolutePath();
     }
-
+    return null;
+}
+    
+    // Procesa un archivo de entrada para cargar el diccionario y el tablero.
     private static void procesarArchivo(String archivo) {
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
             String linea;
